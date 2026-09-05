@@ -3,6 +3,9 @@
 
 A modern, high-performance, culturally authentic website engineered for **Sri Vinayaka Subramanya Ayyappa Swamy Devasthanam**.
 
+🌐 **Live Website:** [https://contactavysolutions.github.io/SVSAS-temple/](https://contactavysolutions.github.io/SVSAS-temple/)  
+📦 **GitHub Repository:** [https://github.com/contactavysolutions/SVSAS-temple](https://github.com/contactavysolutions/SVSAS-temple)
+
 ---
 
 ## 🌟 Key Features
