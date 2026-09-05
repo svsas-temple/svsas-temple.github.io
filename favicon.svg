@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="flameGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF7ED" stop-opacity="1"/>
+      <stop offset="40%" stop-color="#F59E0B" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#DC2626" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#DC2626"/>
+      <stop offset="40%" stop-color="#EA580C"/>
+      <stop offset="75%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#FEF08A"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer aura circle -->
+  <circle cx="32" cy="32" r="30" fill="#781D1D" stroke="#F59E0B" stroke-width="2"/>
+  
+  <!-- Aura glow behind flame -->
+  <circle cx="32" cy="22" r="16" fill="url(#flameGlow)"/>
+  
+  <!-- Flame -->
+  <path d="M 32 10 C 35 17, 39 20, 39 25 C 39 29, 36 32, 32 32 C 28 32, 25 29, 25 25 C 25 20, 29 17, 32 10 Z" fill="url(#flameGrad)"/>
+  
+  <!-- Brass Diya base -->
+  <path d="M 16 34 C 18 43, 46 43, 48 34 C 49 32, 47 31, 44 32 C 38 34, 26 34, 20 32 C 17 31, 15 32, 16 34 Z" fill="url(#brassGrad)"/>
+  
+  <!-- Diya Stand Pedestal -->
+  <path d="M 27 40 L 25 48 L 39 48 L 37 40 Z" fill="url(#brassGrad)"/>
+  <ellipse cx="32" cy="49" rx="14" ry="3" fill="url(#brassGrad)" stroke="#FBBF24" stroke-width="1"/>
+</svg>
