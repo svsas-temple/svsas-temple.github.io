@@ -32,11 +32,22 @@ const TRANSLATIONS = {
     nav_home: "Home",
     nav_deities: "Deities",
     nav_timings: "Timings & Pujas",
+    nav_events: "Events & Festivals",
     nav_donations: "Donations & Bank",
     nav_seva: "Annadanam & Seva",
     nav_poster: "Committee Circular",
     nav_location: "Location",
     nav_donate_btn: "Donate (విరాళం)",
+    
+    events_tag: "Temple Calendar",
+    events_title: "Upcoming Festivals & Announcements",
+    events_subtitle: "Participate in auspicious temple festivals, Brahmotsavams, and special homams.",
+    events_filter_all: "All Celebrations",
+    events_filter_ayyappa: "Ayyappa Swamy",
+    events_filter_vinayaka: "Lord Vinayaka",
+    events_filter_subramanya: "Lord Subramanya",
+    events_btn_inquire: "Inquire on WhatsApp",
+    events_live_badge: "Live Announcements",
     
     ticker_invocation: "ॐ Sri Ganeshayana Namaha | ॐ Saravanabhavaya Namaha | Swamiye Saranam Ayyappa",
     ticker_timings_tag: "Darshan: 6:00 AM – 8:00 PM Daily",
@@ -135,11 +146,22 @@ const TRANSLATIONS = {
     nav_home: "ప్రారంభం",
     nav_deities: "దేవతా మూర్తులు",
     nav_timings: "దర్శన వేళలు & పూజలు",
+    nav_events: "ఉత్సవాలు & ప్రకటనలు",
     nav_donations: "విరాళాలు & బ్యాంక్",
     nav_seva: "అన్నదానం & సేవలు",
     nav_poster: "ఆలయ ప్రకటన",
     nav_location: "మార్గం & చిరునామా",
     nav_donate_btn: "విరాళం ఇవ్వండి",
+    
+    events_tag: "ఆలయ పంచాంగం & ఉత్సవాలు",
+    events_title: "రాబోయే పండుగలు & విశేష ఉత్సవాలు",
+    events_subtitle: "స్వామివార్ల బ్రహ్మోత్సవాలు, విశేష పూజలు మరియు హోమాలలో పాల్గొని కృపాకటాక్షాలను పొందండి.",
+    events_filter_all: "అన్ని ఉత్సవాలు",
+    events_filter_ayyappa: "అయ్యప్ప స్వామి",
+    events_filter_vinayaka: "శ్రీ వినాయక స్వామి",
+    events_filter_subramanya: "శ్రీ సుబ్రమణ్య స్వామి",
+    events_btn_inquire: "వాట్సాప్‌లో వివరాలు అడగండి",
+    events_live_badge: "లైవ్ అప్‌డేట్",
     
     ticker_invocation: "ఓం శ్రీ గణేశాయ నమః | ఓం శరవణభవాయ నమః | స్వామియే శరణం అయ్యప్ప",
     ticker_timings_tag: "దర్శనం: ఉదయం 6:00 నుండి రాత్రి 8:00 వరకు",
@@ -242,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initImageModal();
   initMobileMenu();
   initScrollSpy();
+  initEventsEngine();
 });
 
 /**
@@ -285,6 +308,11 @@ function setLanguage(lang) {
       el.textContent = TRANSLATIONS[lang][key];
     }
   });
+
+  // Re-render events with updated language
+  if (typeof renderEvents === 'function') {
+    renderEvents(currentEventCategory);
+  }
 }
 
 /**
@@ -539,4 +567,250 @@ function initScrollSpy() {
       }
     });
   });
+}
+
+/**
+ * ==========================================================================
+ * Google Sheet Live CMS & Events Engine
+ * Allows the temple committee to add/update events from a Google Sheet or Google Form
+ * ==========================================================================
+ */
+const GOOGLE_SHEET_CONFIG = {
+  // Enter the Public Google Sheet ID here (e.g., '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms')
+  // If left blank or if network fails, the website automatically falls back to the default temple calendar below!
+  sheetId: "",
+  sheetName: "Events"
+};
+
+// Built-in Default Temple Calendar (Automatic Offline Fallback)
+const DEFAULT_EVENTS = [
+  {
+    id: "mandala-kalam",
+    category: "ayyappa",
+    badgeEn: "Annual Grand Festival",
+    badgeTe: "వార్షిక మహోత్సవం",
+    dateEn: "Nov 17, 2026 – Jan 14, 2027",
+    dateTe: "కార్తీక 1 – మకర సంక్రాంతి",
+    timeEn: "Daily 6:00 AM – 8:30 PM",
+    timeTe: "ఉదయం 6:00 – రాత్రి 8:30",
+    titleEn: "Mandala Kalam & Makaravilakku Mahotsavam",
+    titleTe: "మండల కాలం & మకరవిళక్కు మహోత్సవం",
+    descEn: "41-day sacred Mandala Deeksha period. Daily Nitya Padi Pooja, Sastha Preethi, Irumudi Kattu, and grand Annadanam for thousands of Ayyappa devotees.",
+    descTe: "41 రోజుల పవిత్ర మండల దీక్షా కాలం. ప్రతిరోజూ నిత్య పడిపూజ, శాస్తాప్రీతి, ఇరుముడి కట్టు మరియు వేలాదిమంది అయ్యప్ప స్వాములకు మహా అన్నదాన కార్యక్రమం.",
+    specialEn: "Special Padi Pooja every evening during Karthika & Margashira months.",
+    specialTe: "కార్తీక, మార్గశిర మాసాలలో ప్రతిరోజూ సాయంత్రం దివ్య పడిపూజ."
+  },
+  {
+    id: "vinayaka-chavithi",
+    category: "vinayaka",
+    badgeEn: "Brahmotsavam",
+    badgeTe: "బ్రహ్మోత్సవాలు",
+    dateEn: "Bhadrapada Shukla Chavithi",
+    dateTe: "భాద్రపద శుద్ధ చవితి",
+    timeEn: "8:00 AM – 9:00 PM",
+    timeTe: "ఉదయం 8:00 – రాత్రి 9:00",
+    titleEn: "Sri Vinayaka Chavithi Brahmotsavam",
+    titleTe: "శ్రీ వినాయక చవితి మహోత్సవాలు",
+    descEn: "Maha Ganapathi Homam, Sahasra Modaka Havanam, and Vishesha Panchamrita Abhishekam. Cultural devotional bhajans in the evening.",
+    descTe: "మహా గణపతి హోమం, సహస్ర మోదక హవనం, విశేష పంచామృతాభిషేకం మరియు సాయంత్రం భక్తి సంగీత విభావరి.",
+    specialEn: "Devotees can sponsor Modakam and Garika Archana.",
+    specialTe: "భక్తులు మోదక మరియు గరిక అష్టోత్తర పూజలలో పాల్గొనవచ్చు."
+  },
+  {
+    id: "subramanya-sashti",
+    category: "subramanya",
+    badgeEn: "Auspicious Sashti",
+    badgeTe: "విశేష షష్ఠి",
+    dateEn: "Margashira Shukla Sashti",
+    dateTe: "మార్గశిర శుద్ధ షష్ఠి",
+    timeEn: "7:00 AM – 8:00 PM",
+    timeTe: "ఉదయం 7:00 – రాత్రి 8:00",
+    titleEn: "Sri Subramanya Swamy Sashti & Kavadi",
+    titleTe: "శ్రీ సుబ్రహ్మణ్య షష్ఠి & కావడి ఉత్సవం",
+    descEn: "Celebration of Lord Kartikeya's divine victory. Special Vel Pooja, Kuja Dosha Nivarana Homam, and Sri Valli Devasena Kalyanam.",
+    descTe: "శ్రీ వల్లీ దేవసేన సమేత సుబ్రహ్మణ్యేశ్వర స్వామి దివ్య కళ్యాణ మహోత్సవం, విశేష వేల్ పూజ మరియు కుజదోష నివారణ హోమం.",
+    specialEn: "Milk Abhishekam and flower kavadi offerings.",
+    specialTe: "స్వామివారికి క్షీరాభిషేకం మరియు పుష్ప కావడి సమర్పణ."
+  },
+  {
+    id: "sankatahara-chaturthi",
+    category: "vinayaka",
+    badgeEn: "Monthly Special",
+    badgeTe: "మాస విశేషం",
+    dateEn: "Every Krishna Paksha Chaturthi",
+    dateTe: "ప్రతి కృష్ణపక్ష చతుర్థి (ప్రతినెల)",
+    timeEn: "Evening 5:30 PM",
+    timeTe: "సాయంత్రం 5:30",
+    titleEn: "Monthly Sankatahara Chaturthi Vratam",
+    titleTe: "మాస సంకష్టహర చతుర్థి వ్రతం",
+    descEn: "Removal of chronic distress, debt, and obstacles in career through sacred Sankashtahara Ganapathi Archana and Chandra Darshanam.",
+    descTe: "సర్వ సంకటాలను, రుణబాధలను తొలగించే సంకష్టహర గణపతి విశేష అభిషేకం, అర్చన మరియు చంద్రోదయ వేళ మహా మంగళ హారతి.",
+    specialEn: "Teertha prasadam distribution following moonrise.",
+    specialTe: "చంద్ర దర్శనానంతరం తీర్థ ప్రసాద వితరణ."
+  }
+];
+
+let loadedEvents = [...DEFAULT_EVENTS];
+let currentEventCategory = 'all';
+
+async function initEventsEngine() {
+  const container = document.getElementById('eventsContainer');
+  if (!container) return;
+
+  // Check URL param ?sheet=... or localStorage or GOOGLE_SHEET_CONFIG.sheetId
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramSheetId = urlParams.get('sheet');
+  if (paramSheetId) {
+    localStorage.setItem('temple_sheet_id', paramSheetId.trim());
+  }
+  const activeSheetId = (paramSheetId || localStorage.getItem('temple_sheet_id') || GOOGLE_SHEET_CONFIG.sheetId || '').trim();
+
+  // If a Google Sheet ID is provided, fetch live events
+  if (activeSheetId !== '') {
+    const liveEvents = await fetchGoogleSheetEvents(activeSheetId, GOOGLE_SHEET_CONFIG.sheetName);
+    if (liveEvents && liveEvents.length > 0) {
+      loadedEvents = liveEvents;
+      const indicatorText = document.querySelector('.live-sheet-indicator [data-i18n="events_live_badge"]');
+      if (indicatorText) {
+        indicatorText.textContent = currentLang === 'te' ? 'ప్రత్యక్ష గూగుల్ షీట్ అనుసంధానం' : 'Live Google Sheet Sync';
+      }
+    }
+  }
+
+  // Setup category filter tabs
+  const filterBtns = document.querySelectorAll('.event-filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentEventCategory = btn.getAttribute('data-category');
+      renderEvents(currentEventCategory);
+    });
+  });
+
+  renderEvents('all');
+}
+
+function renderEvents(category) {
+  const container = document.getElementById('eventsContainer');
+  if (!container) return;
+
+  const filtered = category === 'all' 
+    ? loadedEvents 
+    : loadedEvents.filter(ev => ev.category === category);
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+        <p>${currentLang === 'te' ? 'ఈ విభాగంలో ప్రస్తుతం విశేష ఉత్సవాలు లేవు.' : 'No special events listed in this category currently.'}</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(ev => {
+    const title = currentLang === 'te' ? (ev.titleTe || ev.titleEn) : ev.titleEn;
+    const date = currentLang === 'te' ? (ev.dateTe || ev.dateEn) : ev.dateEn;
+    const time = currentLang === 'te' ? (ev.timeTe || ev.timeEn) : ev.timeEn;
+    const desc = currentLang === 'te' ? (ev.descTe || ev.descEn) : ev.descEn;
+    const special = currentLang === 'te' ? (ev.specialTe || ev.specialEn) : ev.specialEn;
+    const badge = currentLang === 'te' ? (ev.badgeTe || ev.badgeEn) : ev.badgeEn;
+    
+    // Category Deity Badge Icon
+    let categoryIcon = '🕉️';
+    let categoryName = 'Temple Festival';
+    if (ev.category === 'ayyappa') {
+      categoryIcon = '🪔';
+      categoryName = currentLang === 'te' ? 'అయ్యప్ప స్వామి' : 'Ayyappa Swamy';
+    } else if (ev.category === 'vinayaka') {
+      categoryIcon = '🌺';
+      categoryName = currentLang === 'te' ? 'శ్రీ వినాయక స్వామి' : 'Lord Vinayaka';
+    } else if (ev.category === 'subramanya') {
+      categoryIcon = '✨';
+      categoryName = currentLang === 'te' ? 'శ్రీ సుబ్రమణ్య స్వామి' : 'Lord Subramanya';
+    }
+
+    const whatsappInquiryUrl = `https://wa.me/${TEMPLE_CONFIG.whatsappNumber}?text=${encodeURIComponent(
+      `🕉️ Sri Vinayaka Subramanya Ayyappa Devasthanam, Nacharam\nInquiry regarding upcoming event: ${title} (${date})`
+    )}`;
+
+    return `
+      <div class="event-card" data-category="${ev.category}">
+        <div class="event-card-top">
+          <span class="event-badge">${badge}</span>
+          <span class="event-category-tag">${categoryIcon} ${categoryName}</span>
+        </div>
+        
+        <h3 class="event-title">${title}</h3>
+        
+        <div class="event-meta">
+          <div class="event-meta-item">
+            <span class="meta-icon">📅</span>
+            <span>${date}</span>
+          </div>
+          <div class="event-meta-item">
+            <span class="meta-icon">⏰</span>
+            <span>${time}</span>
+          </div>
+        </div>
+
+        <p class="event-desc">${desc}</p>
+
+        ${special ? `
+          <div class="event-special-box">
+            <span style="color: var(--sacred-red);">🪔</span>
+            <span>${special}</span>
+          </div>
+        ` : ''}
+
+        <div class="event-card-footer">
+          <a href="${whatsappInquiryUrl}" target="_blank" class="btn-event-inquire">
+            <span>💬</span> ${currentLang === 'te' ? 'వాట్సాప్‌లో వివరాలు అడగండి' : 'Inquire on WhatsApp'}
+          </a>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function fetchGoogleSheetEvents(sheetId, sheetName) {
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName || 'Events')}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const text = await res.text();
+    const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+    const data = JSON.parse(jsonString);
+    const rows = data.table.rows;
+    if (!rows || rows.length === 0) return null;
+
+    const events = [];
+    rows.forEach((row, i) => {
+      const c = row.c;
+      if (!c || !c[0] || !c[0].v) return;
+      const isActive = c[8] ? String(c[8].v).toUpperCase() !== 'FALSE' : true;
+      if (!isActive) return;
+
+      events.push({
+        id: `sheet-event-${i}`,
+        titleEn: c[0] ? String(c[0].v) : '',
+        titleTe: c[1] ? String(c[1].v) : (c[0] ? String(c[0].v) : ''),
+        dateEn: c[2] ? String(c[2].v) : '',
+        dateTe: c[2] ? String(c[2].v) : '',
+        timeEn: c[3] ? String(c[3].v) : '',
+        timeTe: c[3] ? String(c[3].v) : '',
+        category: c[4] ? String(c[4].v).toLowerCase().trim() : 'ayyappa',
+        badgeEn: 'Live Announcement',
+        badgeTe: 'తాజా ప్రకటన',
+        descEn: c[5] ? String(c[5].v) : '',
+        descTe: c[6] ? String(c[6].v) : (c[5] ? String(c[5].v) : ''),
+        specialEn: c[7] ? String(c[7].v) : '',
+        specialTe: c[7] ? String(c[7].v) : ''
+      });
+    });
+    return events.length > 0 ? events : null;
+  } catch (err) {
+    console.warn("Google Sheet sync fallback to default calendar:", err);
+    return null;
+  }
 }

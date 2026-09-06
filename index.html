@@ -130,6 +130,7 @@
           <li><a href="#home" class="nav-link active" data-i18n="nav_home">Home</a></li>
           <li><a href="#deities" class="nav-link" data-i18n="nav_deities">Deities</a></li>
           <li><a href="#timings" class="nav-link" data-i18n="nav_timings">Timings & Pujas</a></li>
+          <li><a href="#events" class="nav-link" data-i18n="nav_events">Events & Festivals</a></li>
           <li><a href="#donations" class="nav-link" data-i18n="nav_donations">Donations & Bank</a></li>
           <li><a href="#seva" class="nav-link" data-i18n="nav_seva">Annadanam & Seva</a></li>
           <li><a href="#poster" class="nav-link" data-i18n="nav_poster">Circular</a></li>
@@ -404,8 +405,41 @@
     </div>
   </section>
 
+  <!-- Upcoming Events & Announcements (Google Sheet Live CMS) -->
+  <section id="events" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="live-sheet-indicator">
+          <span class="live-dot"></span>
+          <span data-i18n="events_live_badge">Live Announcements</span>
+        </div>
+        <span class="section-tag" data-i18n="events_tag">Temple Calendar</span>
+        <h2 class="section-title" data-i18n="events_title">Upcoming Festivals & Announcements</h2>
+        <div class="sacred-divider">
+          <span class="diya-icon">🪔</span>
+        </div>
+        <p class="section-subtitle" data-i18n="events_subtitle">
+          Participate in auspicious temple festivals, Brahmotsavams, and special homams.
+        </p>
+
+        <!-- Category Filter Tabs -->
+        <div class="event-filter-tabs">
+          <button class="event-filter-btn active" data-category="all" data-i18n="events_filter_all">All Celebrations</button>
+          <button class="event-filter-btn" data-category="ayyappa" data-i18n="events_filter_ayyappa">Ayyappa Swamy</button>
+          <button class="event-filter-btn" data-category="vinayaka" data-i18n="events_filter_vinayaka">Lord Vinayaka</button>
+          <button class="event-filter-btn" data-category="subramanya" data-i18n="events_filter_subramanya">Lord Subramanya</button>
+        </div>
+      </div>
+
+      <!-- Dynamic Events Container (Powered by Google Sheet / Fallback) -->
+      <div id="eventsContainer" class="events-grid">
+        <!-- Injected dynamically by app.js -->
+      </div>
+    </div>
+  </section>
+
   <!-- Official Committee Poster / Circular Section -->
-  <section id="poster" class="section">
+  <section id="poster" class="section section-alt">
     <div class="container">
       <div class="poster-banner-card">
         <div class="poster-banner-content">
@@ -767,6 +801,7 @@
             <li><a href="#home">Home (ప్రారంభం)</a></li>
             <li><a href="#deities">Presiding Deities (దేవతా మూర్తులు)</a></li>
             <li><a href="#timings">Darshan Timings (దర్శన వేళలు)</a></li>
+            <li><a href="#events">Events & Festivals (ఉత్సవాలు)</a></li>
             <li><a href="#donations">Bank Donations (విరాళాలు)</a></li>
             <li><a href="#poster">Committee Circular (ఆలయ ప్రకటన)</a></li>
             <li><a href="#location">Directions (ఆలయ మార్గం)</a></li>
